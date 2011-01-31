@@ -1,0 +1,65 @@
+=pod
+
+rex-tomcat-deply is a (R)?ex module to deploy tomcat applications.
+
+=head2 Usage
+
+In your Rexfile use the following commands.
+
+ use Rex::Tomcat::Deploy;
+ use Data::Dumper;
+
+ # upload files to this directory
+ deploy_to "/var/tomcat/deploy";
+
+ # the webapps directory. the uploaded war archive will be symlinked into this directory
+ webapps_directory "/var/tomcat/webapps";
+
+ # context path
+ context_path "/myapp";
+
+ # set template configuration file
+ template_file "template.conf";
+
+ # search for filepattern in the webapplication archive to inject values from template.conf
+ template_search_for "*.inject.*";
+  
+ # function to generate real file names from template files
+ generate_real_name sub {
+     my ($template_file_name) = @_;
+     $template_file_name =~ s/\.template//;
+     return $template_file_name;
+ };
+
+ desc "Inject live configuration";
+ task "inject", sub {
+    # extract myapp-1.0.war and search for files name *.template.*. 
+    # open these files and search for template variables and replace it with
+    # the definition in template.conf
+
+    inject "myapp-1.0.war";
+ };
+
+ desc "Upload & Deploy to live servers";
+ task "deploy", "server1", "server2", "server3", sub {
+    # this will upload the file to /var/tomcat/deploy
+    # and create a symlink to /var/tomcat/webapps/myapp from /var/tomcat/deploy/myapp-1.0.war
+
+    deploy "myapp-1.0.war";
+ };
+
+ desc "List all deployed versions";
+ task "list", "server1", "server2", "server3", sub {
+    print Dumper([ list_versions ]);
+ };
+
+ desc "Switch to an other version (rollback)";
+ task "rollback", "server1", "server2", "server3", sub {
+    my ($params) = @_;
+
+    if ( exists $params->{'version'} ) {
+       switch_to_version $params->{'version'};
+    }
+ };
+
+
