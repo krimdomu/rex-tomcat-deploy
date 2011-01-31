@@ -1,4 +1,4 @@
-rex-apache-deploy (0.1) unstable; urgency=low
+rex-tomcat-deploy (0.1) unstable; urgency=low
   * initial package
- -- Jan Gehring <jan.gehring@gmail.com>  Fri, 28 Jan 2011 22:20:00 +0200
+ -- Jan Gehring <jan.gehring@gmail.com>  Mon, 31 Jan 2011 22:30:00 +0200
 
