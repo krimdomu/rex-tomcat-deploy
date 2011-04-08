@@ -22,7 +22,7 @@ use Rex::Commands::Fs;
 use Rex::Commands::Upload;
 use Rex::Commands;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 require Exporter;
 use base qw(Exporter);
@@ -61,7 +61,10 @@ sub inject {
       my $content = eval { local(@ARGV, $/) = ($file); $_=<>; $_; };
       for my $key (keys %$template_params) {
          my $val = $template_params->{$key};
-         $content =~ s/\@$key\@/$val/g;
+         if($content =~ m/\@$key\@/gm) {
+            Rex::Logger::info("Replacing \@$key\@ with $val ($file)");
+            $content =~ s/\@$key\@/$val/g;
+         }
       }
 
       my $new_file_name = &$real_name_from_template($file);
@@ -90,7 +93,7 @@ sub switch_to_version {
    my ($new_version) = @_;
 
    my @versions = list_versions;
-   if(! grep { /$new_version/ } @versions) { print "no version found!\n"; return; }
+   if(! grep { /$new_version/ } @versions) { Rex::Logger::info("no version found!"); return; }
 
    run "rm $webapps_directory/$context_path.war";
    sleep 10;
